@@ -1,5 +1,7 @@
 #include "flow.h"
 
+using namespace flow;
+
 std::shared_ptr<FlowStep> Flow::add_step(std::shared_ptr<FlowStep> step)
 {
   steps.emplace_back(step);

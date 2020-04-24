@@ -1,5 +1,6 @@
 #include "flow_step.h"
 
+using namespace flow;
 
 FlowStep::FlowStep(std::wstring name) : name(name)
 {

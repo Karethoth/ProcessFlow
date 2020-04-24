@@ -1,5 +1,6 @@
-
 #include "flow_step_process.h"
+
+using namespace flow;
 
 FlowStepProcess::FlowStepProcess(std::wstring _cmd, std::wstring _name) : FlowStep(_name), cmd(_cmd)
 {

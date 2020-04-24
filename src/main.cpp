@@ -38,17 +38,17 @@ int main()
   attron(COLOR_PAIR(1));
   */
 
-  Flow flow;
+  flow::Flow test_flow;
 
   {
-    auto step1 = flow.add_step(std::make_shared<FlowStepProcess>( L"TestExecutable produce" ));
-    auto step2 = flow.add_step(std::make_shared<FlowStepProcess>( L"TestExecutable consume", L"Consumer #1" ));
-    auto step3 = flow.add_step(std::make_shared<FlowStepProcess>( L"TestExecutable consume", L"Consumer #2" ));
+    auto step1 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable produce" ));
+    auto step2 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #1" ));
+    auto step3 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #2" ));
 
-    flow.connect_steps(step1, step2);
-    flow.connect_steps(step2, step3);
+    test_flow.connect_steps(step1, step2);
+    test_flow.connect_steps(step2, step3);
 
-    const auto data_cb = [](const std::string& data, const FlowStep &context)
+    const auto data_cb = [](const std::string& data, const flow::FlowStep &context)
     {
       static std::mutex cout_mutex{};
       std::lock_guard cout_lock{ cout_mutex };
@@ -59,13 +59,13 @@ int main()
     step2->set_data_callback(data_cb);
     step3->set_data_callback(data_cb);
 
-    flow.start();
+    test_flow.start();
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
 
   for (;;)
   {
-    if (!flow.is_running())
+    if (!test_flow.is_running())
     {
       break;
     }
