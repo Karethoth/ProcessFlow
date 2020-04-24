@@ -39,6 +39,7 @@ int main()
   */
 
   Flow flow;
+
   {
     auto step1 = flow.add_step(std::make_shared<FlowStepProcess>( L"TestExecutable produce" ));
     auto step2 = flow.add_step(std::make_shared<FlowStepProcess>( L"TestExecutable consume", L"Consumer #1" ));
@@ -61,6 +62,7 @@ int main()
     flow.start();
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
+
   for (;;)
   {
     if (!flow.is_running())

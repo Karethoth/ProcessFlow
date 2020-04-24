@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\flow.cpp" />
     <ClCompile Include="src\flow_step.cpp" />
     <ClCompile Include="src\flow_step_process.cpp" />
     <ClCompile Include="src\main.cpp" />
