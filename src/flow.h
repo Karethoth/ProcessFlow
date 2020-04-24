@@ -35,8 +35,7 @@ struct Flow
 
     if (matched_parent && matched_child)
     {
-      std::lock_guard next_steps_lock{ matched_parent->next_steps_mutex };
-      matched_parent->next_steps.push_back(matched_child);
+      matched_parent->add_next_step(matched_child);
     }
     else
     {

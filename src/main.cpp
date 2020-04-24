@@ -54,9 +54,9 @@ int main()
       std::cout << "" << data;
     };
 
-    step1->data_cb = data_cb;
-    step2->data_cb = data_cb;
-    step3->data_cb = data_cb;
+    step1->set_data_callback(data_cb);
+    step2->set_data_callback(data_cb);
+    step3->set_data_callback(data_cb);
 
     flow.start();
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

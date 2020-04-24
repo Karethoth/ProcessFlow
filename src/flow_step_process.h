@@ -25,11 +25,10 @@ struct FlowStepProcess : FlowStep
 
 public:
   std::wstring cmd;
-  std::wstring name;
 
-  explicit FlowStepProcess(std::wstring _cmd, std::wstring _name=L"") : cmd(_cmd), name(_name)
+  explicit FlowStepProcess(std::wstring _cmd, std::wstring _name=L"") : FlowStep(_name), cmd(_cmd)
   {
-    if (!name.length())
+    if (!_name.length())
     {
       name = cmd;
     }
@@ -54,7 +53,7 @@ public:
 
   virtual ~FlowStepProcess() noexcept
   {
-    std::wcout << "Destroying " << name << std::endl;
+    std::wcout << "Destroying process " << name << std::endl;
 
     // Stop reader thread
     if (io.reader_thread.joinable())
