@@ -154,6 +154,11 @@ public:
   {
     io.should_stop = true;
     io.eof         = true;
+
+    for (auto& next_step : next_steps)
+    {
+      next_step->handle_parent_eof();
+    }
   }
 
   virtual void handle_parent_eof()

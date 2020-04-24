@@ -79,7 +79,7 @@ struct Flow
   {
     for (const auto& step : steps)
     {
-      if(step->is_running())
+      if (step->is_running())
       {
         return true;
       }

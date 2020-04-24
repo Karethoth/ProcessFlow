@@ -35,6 +35,7 @@ public:
     }
   };
 
+  explicit FlowStepProcess(FlowStepProcess&&) = delete;
   /*
   explicit FlowStepProcess(FlowStepProcess&& other) noexcept
   {
@@ -161,6 +162,7 @@ public:
     {
       return true;
     }
+
     return false;
   }
 
