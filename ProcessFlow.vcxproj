@@ -28,6 +28,7 @@
     <ClInclude Include="src\flow.h" />
     <ClInclude Include="src\flow_step.h" />
     <ClInclude Include="src\flow_step_process.h" />
+    <ClInclude Include="src\tui.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

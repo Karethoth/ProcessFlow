@@ -1,10 +1,11 @@
 #include "flow.h"
 #include "flow_step.h"
 #include "flow_step_process.h"
+#include "tui.h"
 
 extern "C"
 {
-#define PDC_WIDE
+  #define PDC_WIDE
   #include <curses.h>
   #include <panel.h>
 }
@@ -20,7 +21,13 @@ extern "C"
 #include <sstream>
 #include <functional>
 
-static void finish(int sig);
+
+static void finish(int sig)
+{
+  endwin();
+  exit(0);
+}
+
 
 int main()
 {
@@ -30,16 +37,18 @@ int main()
 
   signal(SIGINT, finish);
 
-  /*
   auto win = initscr();
-
+  resize_term(50, 150);
   start_color();
-  init_pair(1, COLOR_RED, COLOR_BLACK);
-  attron(COLOR_PAIR(1));
-  */
+  init_pair(1, COLOR_CYAN, COLOR_BLACK);
+  init_pair(2, COLOR_WHITE, COLOR_BLACK);
 
+  Tui tui{};
+
+  wattron(tui.main_panel->window, COLOR_PAIR(2));
+
+  tui.render();
   flow::Flow test_flow;
-
   {
     auto step1 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable produce" ));
     auto step2 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #1" ));
@@ -48,11 +57,15 @@ int main()
     test_flow.connect_steps(step1, step2);
     test_flow.connect_steps(step2, step3);
 
-    const auto data_cb = [](const std::string& data, const flow::FlowStep &context)
+    const auto data_cb = [&](const std::string& data, const flow::FlowStep &context)
     {
       static std::mutex cout_mutex{};
       std::lock_guard cout_lock{ cout_mutex };
-      std::cout << "" << data;
+      waddwstr(tui.main_panel->window, context.name.c_str());
+      waddstr(tui.main_panel->window, ": ");
+      waddstr(tui.main_panel->window, data.c_str());
+      tui.render();
+      refresh();
     };
 
     step1->set_data_callback(data_cb);
@@ -72,19 +85,10 @@ int main()
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
-  //printw(step.cmd.c_str());
-  /*
-  mvaddwstr(0, 0, step.cmd.c_str());
-  refresh();
-  attroff(COLOR_PAIR(1));
-
-  step.wait_to_end();
+  waddwstr(tui.main_panel->window, L"EOF! Press any key to exit.");
+  wattroff(tui.main_panel->window, COLOR_PAIR(2));
+  getch();
 
   endwin();
-  */
 }
-static void finish(int sig)
-{
-  //endwin();
-  exit(0);
-}
+

@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
 
   // Producer
-  for (auto i=0; i<10; i++)
+  for (auto i=0; i<100; i++)
   {
     std::cout << i << "a\tTest\t" << i << "b" << std::endl;
     std::flush(std::cout);
