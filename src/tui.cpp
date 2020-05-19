@@ -9,6 +9,7 @@ extern "C"
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include <exception>
 #include <iostream>
 
@@ -28,15 +29,18 @@ TuiPanel::TuiPanel(int x, int y, int width, int height)
   }
 }
 
+
 void TuiPanel::attron(chtype attr)
 {
   wattron(window, attr);
 }
 
+
 void TuiPanel::attroff(chtype attr)
 {
   wattroff(window, attr);
 }
+
 
 TuiPanel::~TuiPanel() noexcept
 {
@@ -66,6 +70,7 @@ TuiViewMenu::TuiViewMenu(const Tui *tui) : main_tui(tui)
   // Mark the first option as selected
   options[0].active = true;
 }
+
 
 void TuiViewMenu::render() {
 
@@ -145,6 +150,23 @@ void TuiViewFlow::render() {
   panel->attroff(A_UNDERLINE);
 
   top_panel(panel->panel);
+
+  if (!current_flow || !current_flow->get_root_step())
+  {
+    return;
+  }
+
+  // Render the visible portion of the flow grid
+
+  const auto grid_size = current_flow->get_grid_size();
+
+  /* TODO
+   * - Keep track of the view offset / coordinate of the active cell
+   * - Calculate visible portion based on the UI dimensions
+   * - Render step names and borders
+   *  - Highlight active one
+   * - Render lines connecting the steps together
+   */
 
   update_panels();
   doupdate();

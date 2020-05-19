@@ -76,6 +76,8 @@ int main()
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   }
 
+  tui.view_flow.set_current_flow(std::make_shared<flow::Flow>(test_flow));
+
   for (;;)
   {
     if (!test_flow.is_running())

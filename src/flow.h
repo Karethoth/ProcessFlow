@@ -4,6 +4,10 @@
 
 namespace flow
 {
+  struct FlowSize
+  {
+    int w, h;
+  };
 
   class Flow
   {
@@ -13,6 +17,9 @@ namespace flow
   public:
     std::shared_ptr<FlowStep> add_step(std::shared_ptr<FlowStep> step);
 
+    [[nodiscard]]
+    std::shared_ptr<FlowStep> get_root_step();
+
     void connect_steps(
       const std::shared_ptr<FlowStep>& parent,
       const std::shared_ptr<FlowStep>& child
@@ -20,7 +27,12 @@ namespace flow
 
     void start();
     bool is_running();
+
+
+    // Returns the grid dimensions required to render the flow
+    [[nodiscard]]
+    FlowSize get_grid_size() const;
   };
 
-
 };
+

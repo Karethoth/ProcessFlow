@@ -40,6 +40,17 @@ void Flow::connect_steps(
 }
 
 
+std::shared_ptr<FlowStep> Flow::get_root_step()
+{
+  if (!steps.size())
+  {
+    return { nullptr };
+  }
+
+  return steps[0];
+}
+
+
 void Flow::start()
 {
   std::vector<std::shared_ptr<FlowStep>> started_steps{};
@@ -83,5 +94,48 @@ bool Flow::is_running()
   }
 
   return false;
+}
+
+
+[[nodiscard]]
+FlowSize calc_flow_grid_size(const std::shared_ptr<flow::FlowStep>& step)
+{
+  //std::lock_guard step_lock{step->next_steps_mutex};
+
+  if (!step)
+  {
+    return { 1, 1 };
+  }
+
+  FlowSize dim;
+  dim.w = 1;
+  dim.h = step->next_steps.size() || 1;
+
+  for (const auto& next_step : step->next_steps)
+  {
+    const auto next_dim = calc_flow_grid_size(next_step);
+    if (next_dim.w >= dim.w)
+    {
+      dim.w = next_dim.w + 1;
+    }
+    
+    if (next_dim.h > 1)
+    {
+      dim.h += next_dim.h - 1;
+    }
+  }
+
+  return dim;
+}
+
+
+FlowSize Flow::get_grid_size() const
+{
+  if (!steps.size())
+  {
+    return { 1,1 };
+  }
+
+  return calc_flow_grid_size(steps[0]);
 }
 

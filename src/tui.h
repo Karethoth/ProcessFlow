@@ -1,5 +1,7 @@
 #pragma once
 
+#include "flow.h"
+
 extern "C"
 {
   #define PDC_WIDE
@@ -59,9 +61,17 @@ struct TuiViewFlow
   std::unique_ptr<TuiPanel> panel;
   const Tui *main_tui;
 
+  std::shared_ptr<flow::Flow> current_flow;
+
   TuiViewFlow(const Tui* tui);
   void render();
+
+  void set_current_flow(std::shared_ptr<flow::Flow> flow)
+  {
+    current_flow = flow;
+  }
 };
+
 
 struct Tui
 {
@@ -72,3 +82,4 @@ struct Tui
   Tui();
   void render();
 };
+
