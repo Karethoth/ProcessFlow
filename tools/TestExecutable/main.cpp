@@ -36,13 +36,14 @@ int main(int argc, char **argv)
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
-    std::cout << "Reached end" << std::endl;
+    std::cout << "Reached endxx" << std::endl;
+    std::flush(std::cout);
     return 0;
   }
 
 
   // Producer
-  for (auto i=0; i<100; i++)
+  for (auto i=0; i<10; i++)
   {
     std::cout << i << "a\tTest\t" << i << "b" << std::endl;
     std::flush(std::cout);

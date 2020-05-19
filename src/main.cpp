@@ -45,7 +45,7 @@ int main()
 
   Tui tui{};
 
-  wattron(tui.main_panel->window, COLOR_PAIR(2));
+  tui.main_panel->attron(COLOR_PAIR(2));
 
   tui.render();
   flow::Flow test_flow;
@@ -86,7 +86,7 @@ int main()
   }
 
   waddwstr(tui.main_panel->window, L"EOF! Press any key to exit.");
-  wattroff(tui.main_panel->window, COLOR_PAIR(2));
+  tui.main_panel->attroff(COLOR_PAIR(2));
   getch();
 
   endwin();
