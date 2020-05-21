@@ -213,9 +213,43 @@ void TuiViewFlow::render()
     const int src_x,
     const int src_y,
     const int tgt_x,
-    const int tgt_y
+    const int tgt_y,
+    const bool has_horizontal_connection // In case of vertical difference, use ACS_TTEE instead of ACS_URCORNER
   )
   {
+    const int src_offset_x = step_spacing_x * src_x + (src_x - 1) * step_width + step_width;
+    const int src_offset_y = step_spacing_y * src_y + (src_y - 1) * step_height + step_height/2;
+    const int tgt_offset_x = step_spacing_x * tgt_x + (tgt_x - 1) * step_width;
+    const int tgt_offset_y = step_spacing_y * tgt_y + (tgt_y - 1) * step_height + step_height/2;
+
+    // Render the characters connecting the step boxes and the lines
+    mvwaddch(panel->window, src_offset_y, src_offset_x, ACS_LTEE);
+    mvwaddch(panel->window, tgt_offset_y, tgt_offset_x, ACS_RTEE);
+
+    if (src_y == tgt_y)
+    {
+      // If there is no vertical difference, just one horizontal line does the job
+      mvwhline(panel->window, src_offset_y, src_offset_x, ACS_HLINE, step_spacing_x);
+      return;
+    }
+
+    // Render horizontal splits
+    mvwhline(panel->window, src_offset_y, src_offset_x+1, ACS_HLINE, step_spacing_x/2);
+    mvwhline(panel->window, src_offset_y, src_offset_x+1 + step_spacing_x/2, ACS_HLINE, step_spacing_x/2-1);
+
+    // Render the vertical line
+    mvwvline(panel->window, src_offset_y, src_offset_x+1+step_spacing_x/2, ACS_VLINE, tgt_offset_y - src_offset_y);
+
+    // Render the characters connecting the horizontal line splits to the vertical line
+    if (has_horizontal_connection)
+    {
+      mvwaddch(panel->window, src_offset_y, src_offset_x+1+step_spacing_x/2, ACS_TTEE);
+    }
+    else
+    {
+      mvwaddch(panel->window, src_offset_y, src_offset_x+1+step_spacing_x/2, ACS_URCORNER);
+    }
+    mvwaddch(panel->window, tgt_offset_y, src_offset_x+1+step_spacing_x/2, ACS_LLCORNER);
   };
 
   const std::function<void(const int, const int, const flow::FlowStep&)>
@@ -230,12 +264,17 @@ void TuiViewFlow::render()
     const int next_step_offset_x = step_x + 1;
     int       next_step_offset_y = step_y;
 
+    bool has_horizontal_connection = false;
     for (const auto next_step : step.next_steps)
     {
       render_steps( next_step_offset_x, next_step_offset_y, *next_step );
-      render_connection(step_x, step_y, next_step_offset_x, next_step_offset_y);
+      if (step_y == next_step_offset_y)
+      {
+        has_horizontal_connection = true;
+      }
+      render_connection(step_x, step_y, next_step_offset_x, next_step_offset_y, has_horizontal_connection);
+
       const auto branch_size = next_step->get_branch_flow_grid_size();
-      
       next_step_offset_y += branch_size.h;
     }
   };
