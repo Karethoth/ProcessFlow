@@ -143,14 +143,6 @@ TuiViewFlow::TuiViewFlow(const Tui* tui) : main_tui(tui)
 
 void TuiViewFlow::render()
 {
-
-  panel->attron(A_UNDERLINE);
-  panel->attron(COLOR_PAIR(1));
-  std::wstring t_msg = L"Test";
-  mvwaddwstr(panel->window, 1, 1, t_msg.c_str());
-  panel->attroff(COLOR_PAIR(1));
-  panel->attroff(A_UNDERLINE);
-
   top_panel(panel->panel);
 
   if (!current_flow || !current_flow->get_root_step())
@@ -284,14 +276,6 @@ void TuiViewFlow::render()
     1, 1,
     *root_step
   );
-
-  /* TODO
-   * - Keep track of the view offset / coordinate of the active cell
-   * - Calculate visible portion based on the UI dimensions
-   * - Render step names and borders
-   *  - Highlight active one
-   * - Render lines connecting the steps together
-   */
 
   update_panels();
   doupdate();
