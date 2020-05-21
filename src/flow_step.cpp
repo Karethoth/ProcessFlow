@@ -106,3 +106,44 @@ void FlowStep::handle_parent_eof()
   io.should_stop = true;
 }
 
+
+[[nodiscard]]
+FlowSize calc_flow_grid_size(const flow::FlowStep* step)
+{
+  //std::lock_guard step_lock{step->next_steps_mutex};
+
+  if (!step)
+  {
+    return { 1, 1 };
+  }
+
+  FlowSize dim;
+  dim.w = 1;
+  dim.h = step->next_steps.size();
+  if (!dim.h)
+  {
+    dim.h = 1;
+  }
+
+  for (const auto& next_step : step->next_steps)
+  {
+    const auto next_dim = calc_flow_grid_size(&(*next_step));
+    if (next_dim.w >= dim.w)
+    {
+      dim.w = next_dim.w + 1;
+    }
+    
+    if (next_dim.h > 1)
+    {
+      dim.h += next_dim.h - 1;
+    }
+  }
+
+  return dim;
+}
+
+
+FlowSize FlowStep::get_branch_flow_grid_size() const
+{
+  return calc_flow_grid_size(this);
+}

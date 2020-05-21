@@ -1,5 +1,6 @@
 #pragma once
 
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -15,6 +16,10 @@
 
 namespace flow
 {
+  struct FlowSize
+  {
+    int w, h;
+  };
 
   template<size_t t_buffer_size, typename T = char>
   struct BufferedData
@@ -77,6 +82,8 @@ namespace flow
 
     virtual void handle_eof();
     virtual void handle_parent_eof();
+
+    FlowSize get_branch_flow_grid_size() const;
   };
 
 };

@@ -54,8 +54,14 @@ int main()
     auto step2 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #1" ));
     auto step3 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #2" ));
 
+    auto step4 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #3" ));
+    auto step5 = test_flow.add_step(std::make_shared<flow::FlowStepProcess>( L"TestExecutable consume", L"Consumer #4" ));
+
     test_flow.connect_steps(step1, step2);
+    test_flow.connect_steps(step1, step4);
+
     test_flow.connect_steps(step2, step3);
+    test_flow.connect_steps(step2, step5);
 
     const auto data_cb = [&](const std::string& data, const flow::FlowStep &context)
     {
@@ -71,6 +77,8 @@ int main()
     step1->set_data_callback(data_cb);
     step2->set_data_callback(data_cb);
     step3->set_data_callback(data_cb);
+    step4->set_data_callback(data_cb);
+    step5->set_data_callback(data_cb);
 
     test_flow.start();
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

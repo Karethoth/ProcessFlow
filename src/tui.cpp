@@ -11,6 +11,7 @@ extern "C"
 #include <memory>
 #include <mutex>
 #include <exception>
+#include <functional>
 #include <iostream>
 
 
@@ -130,17 +131,18 @@ void TuiViewMenu::render() {
 }
 
 
-TuiViewFlow::TuiViewFlow(const Tui *tui) : main_tui(tui)
+TuiViewFlow::TuiViewFlow(const Tui* tui) : main_tui(tui)
 {
   const int width = COLS;
   panel = std::make_unique<TuiPanel>(
     0, 0,
     width, LINES - menu_height
-  );
+    );
   top_panel(panel->panel);
 }
 
-void TuiViewFlow::render() {
+void TuiViewFlow::render()
+{
 
   panel->attron(A_UNDERLINE);
   panel->attron(COLOR_PAIR(1));
@@ -159,6 +161,90 @@ void TuiViewFlow::render() {
   // Render the visible portion of the flow grid
 
   const auto grid_size = current_flow->get_grid_size();
+
+  const int step_width = 25;
+  const int step_height = 4;
+  const int step_spacing_x = 3;
+  const int step_spacing_y = 1;
+
+  const int view_area_w = 40;
+  const int view_area_h = 20;
+
+  const int active_step_x = 1;
+  const int active_step_y = 1;
+
+  const int view_offset_x = (active_step_x - 1) * (step_spacing_x + step_width);
+  const int view_offset_y = (active_step_y - 1) * (step_spacing_y + step_height);
+
+  const auto render_step = [&](
+    const int step_x,
+    const int step_y,
+    const flow::FlowStep& step
+  )
+  {
+    const int step_offset_x = step_spacing_x * step_x + (step_x - 1) * step_width;
+    const int step_offset_y = step_spacing_y * step_y + (step_y - 1) * step_height;
+
+    mvwvline(panel->window, step_offset_y, step_offset_x, ACS_VLINE, step_height);
+    mvwvline(panel->window, step_offset_y, step_offset_x + step_width, ACS_VLINE, step_height);
+    mvwhline(panel->window, step_offset_y, step_offset_x, ACS_HLINE, step_width);
+    mvwhline(panel->window, step_offset_y + step_height, step_offset_x, ACS_HLINE, step_width);
+    mvwaddch(panel->window, step_offset_y, step_offset_x, ACS_ULCORNER);
+    mvwaddch(panel->window, step_offset_y, step_offset_x + step_width, ACS_URCORNER);
+    mvwaddch(panel->window, step_offset_y + step_height, step_offset_x, ACS_LLCORNER);
+    mvwaddch(panel->window, step_offset_y + step_height, step_offset_x + step_width, ACS_LRCORNER);
+
+
+    if (active_step_x == step_x && active_step_y == step_y)
+    {
+      panel->attron(A_BOLD);
+      mvwaddwstr(panel->window, step_offset_y + 1, step_offset_x + 1, step.name.c_str());
+      panel->attroff(A_BOLD);
+    }
+    else
+    {
+      mvwaddwstr(panel->window, step_offset_y + 1, step_offset_x + 1, step.name.c_str());
+    }
+  };
+
+
+  // src_x < tgt_x && src_y <= tgt_y
+  const auto render_connection = [&](
+    const int src_x,
+    const int src_y,
+    const int tgt_x,
+    const int tgt_y
+  )
+  {
+  };
+
+  const std::function<void(const int, const int, const flow::FlowStep&)>
+  render_steps = [&](
+    const int step_x,
+    const int step_y,
+    const flow::FlowStep& step
+  )
+  {
+    render_step(step_x, step_y, step);
+
+    const int next_step_offset_x = step_x + 1;
+    int       next_step_offset_y = step_y;
+
+    for (const auto next_step : step.next_steps)
+    {
+      render_steps( next_step_offset_x, next_step_offset_y, *next_step );
+      render_connection(step_x, step_y, next_step_offset_x, next_step_offset_y);
+      const auto branch_size = next_step->get_branch_flow_grid_size();
+      
+      next_step_offset_y += branch_size.h;
+    }
+  };
+
+  const auto root_step = current_flow->get_root_step();
+  render_steps(
+    1, 1,
+    *root_step
+  );
 
   /* TODO
    * - Keep track of the view offset / coordinate of the active cell

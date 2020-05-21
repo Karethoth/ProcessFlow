@@ -4,11 +4,6 @@
 
 namespace flow
 {
-  struct FlowSize
-  {
-    int w, h;
-  };
-
   class Flow
   {
     std::vector<std::shared_ptr<FlowStep>> steps{};
